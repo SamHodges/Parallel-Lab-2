@@ -1,0 +1,73 @@
+README
+
+I first initialized multithreading split by rows.
+Scores for just multithreading:
+|------|------------------|-------------|------------------|---------|
+| size | avg runtime (ms) | improvement | iteration per us | passed? |
+|------|------------------|-------------|------------------|---------|
+|  128 |               47 |        0.38 |               44 |     yes |
+|  256 |                8 |        4.59 |             2083 |     yes |
+|  512 |               77 |        3.31 |             1735 |     yes |
+| 1024 |             1433 |        1.68 |              748 |     yes |
+| 2048 |            18388 |        3.22 |              467 |     yes |
+|------|------------------|-------------|------------------|---------|
+
+
+I then added some clauses in case the size wasn't divisible by the number of cores, but
+this didn't change the results since they only use divisible sizes.
+
+Finally, we had a group meeting, where we discussed further optimization through the use of
+a transposed matrix. I suggested implementing it prior to starting the threads, so that
+it would not have to be calculated each time. We also debated using two separate for loops,
+but dropped I dropped it before I finished programming anything, since it seemed to just
+be making another transposed matrix during the threading process.
+
+Final Optimizations:
+Multithreading: I split it into threads, with each thread having an assigned number of
+rows. Depending on whether the the size of the matrix is divisible (which it is in
+the provided test cases), all threads will have equal amount of work. Threads will never 
+have more than a difference of 1 in terms of rows assigned.
+
+Transposed matrix: Before starting the threads, I create a tranposed matrix. This means
+the code can access everything row-by-row, although I do think the accessing of 2 
+matrices may cause some slowdown if there's a 1-matrix solution.
+
+
+Final scores:
+|------|------------------|-------------|------------------|---------|
+| size | avg runtime (ms) | improvement | iteration per us | passed? |
+|------|------------------|-------------|------------------|---------|
+|  128 |               57 |        0.45 |               36 |     yes |
+|  256 |               12 |        3.11 |             1331 |     yes |
+|  512 |               28 |       13.71 |             4664 |     yes |
+| 1024 |              212 |       16.82 |             5043 |     yes |
+| 2048 |             2423 |       38.23 |             3544 |     yes |
+|------|------------------|-------------|------------------|---------|
+
+
+
+Extra Credit:
+I decided to continue with the extra credit. the getShortcut() functions calculate the shortest path by looking at the
+shortest paths so far, and seeing if any can be added together to create a shorter path. In other words, every
+time it's run, it looks for potential shortcuts an extra node out (so running n times would be able to find a path
+along n different nodes).
+
+The maximum path, assuming no negative weights, is n-1. Any more and it would have to repeat a node. Therefore,
+by running the getShortcut() function n-1 times, it finds the shortest path overall.
+
+Results:
+Example matrix:
+{{0.0F, 5.0F, 6.0F, 1.0F},
+ {1.0F, 0.0F, 4.0F, 7.0F},
+ {3.0F, 3.0F, 0.0F, 2.0F},
+ {2.0F, 5.0F, 1.0F, 0.0F}};
+ 
+ Original matrix:
+[[0.0, 5.0, 6.0, 1.0], [1.0, 0.0, 4.0, 7.0], [3.0, 3.0, 0.0, 2.0], [2.0, 5.0, 1.0, 0.0]]
+Shortcut matrix:
+[[0.0, 5.0, 2.0, 1.0], [1.0, 0.0, 4.0, 2.0], [3.0, 3.0, 0.0, 2.0], [2.0, 4.0, 1.0, 0.0]]
+Overall Shortcut matrix:
+[[0.0, 5.0, 2.0, 1.0], [1.0, 0.0, 3.0, 2.0], [3.0, 3.0, 0.0, 2.0], [2.0, 4.0, 1.0, 0.0]]
+
+These results were as expected according to my calculations, although I wasn't able to accurately test it
+with random matrices (since I had no solutions to check it against if I did).
